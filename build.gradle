@@ -1,0 +1,60 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.kotlin_version = '1.2.31'
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenLocal()
+        //proxy for nexus server
+
+        maven {
+            url "https://raw.githubusercontent.com/Goddchen/mvn-repo/master/"
+        }
+
+        maven { url "https://jitpack.io" }
+
+        jcenter()
+
+        maven { url 'https://maven.google.com' }
+    }
+
+    ext {
+
+        // Compile dependencies
+        supportVersion = "27.1.0"
+        daggerVersion = "2.11"
+        retrofitVersion = "2.3.0"
+        okhttpVersion = "3.6.0"
+        glideVersion = "3.7.0"
+        butterknifeVersion = "8.8.1"
+        databindingCompilerVersion = "2.3.3"
+        rxKotlinVersion = "2.2.0"
+        rxAndroidVersion = "2.0.1"
+        ankoVersion = "0.10.4"
+        constraintLayoutVersion = "1.0.2"
+        espressoVersion = '3.0.1'
+        junitVersion = '4.12'
+
+        // Unit tests
+        mockitoVersion = "2.8.47"
+        espressoVersion = "3.0.1"
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
