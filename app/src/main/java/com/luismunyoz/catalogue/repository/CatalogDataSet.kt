@@ -8,4 +8,11 @@ interface CatalogDataSet {
     fun requestCategories(): List<Category>
 
     fun requestProductsForCategory(category: Category): List<Product>
+
+    fun saveCategories(categories: List<Category>)
+
+    fun saveProductsForCategory(category: Category, products: List<Product>)
+
+    fun canBeUpdated(): Boolean
+
 }

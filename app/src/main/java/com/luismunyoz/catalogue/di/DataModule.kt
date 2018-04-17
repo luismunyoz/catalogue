@@ -1,11 +1,15 @@
 package com.luismunyoz.catalogue.di
 
+import android.arch.persistence.room.Room
 import android.content.Context
 import com.luismunyoz.catalogue.BuildConfig
 import com.luismunyoz.catalogue.data.api.APICatalogDataSet
 import com.luismunyoz.catalogue.data.api.ApiService
+import com.luismunyoz.catalogue.data.room.CatalogDatabase
+import com.luismunyoz.catalogue.data.room.RoomCatalogDataSet
 import com.luismunyoz.catalogue.di.qualifier.ApiQualifier
 import com.luismunyoz.catalogue.di.qualifier.ApplicationQualifier
+import com.luismunyoz.catalogue.di.qualifier.RoomQualifier
 import com.luismunyoz.catalogue.repository.CatalogDataSet
 import dagger.Module
 import dagger.Provides
@@ -46,4 +50,10 @@ class DataModule {
 
     @Provides @Singleton @ApiQualifier
     fun providesApiDataSource(apiService: ApiService): CatalogDataSet = APICatalogDataSet(apiService)
+
+    @Provides @Singleton
+    fun providesCatalogDatabase(@ApplicationQualifier context: Context) : CatalogDatabase = Room.databaseBuilder(context, CatalogDatabase::class.java, "catalog").build()
+
+    @Provides @Singleton @RoomQualifier
+    fun providesRoomDataSource(catalogDatabase: CatalogDatabase) : RoomCatalogDataSet = RoomCatalogDataSet(catalogDatabase)
 }

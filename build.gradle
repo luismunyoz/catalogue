@@ -48,6 +48,7 @@ allprojects {
         constraintLayoutVersion = "1.0.2"
         espressoVersion = '3.0.1'
         junitVersion = '4.12'
+        roomVersion = '1.0.0'
 
         // Unit tests
         mockitoVersion = "2.8.47"
