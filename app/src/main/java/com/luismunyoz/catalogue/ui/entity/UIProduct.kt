@@ -13,5 +13,5 @@ data class UIProduct (
 
     fun getComments(): String = numComments.toString()
 
-    fun getReadablePrice(): String = "$ $price"
+    fun getReadablePrice(): String = "$price€"
 }

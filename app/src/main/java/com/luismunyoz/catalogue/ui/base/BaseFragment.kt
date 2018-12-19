@@ -12,11 +12,6 @@ abstract class BaseFragment<V : BaseContract.View, P : BaseContract.Presenter<V>
 
     open lateinit var presenter: P
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        injectDependencies(App.graph)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view : View? = inflater.inflate(getLayoutId(), container, false)
         presenter.attachView(this as V)
@@ -29,6 +24,4 @@ abstract class BaseFragment<V : BaseContract.View, P : BaseContract.Presenter<V>
     }
 
     abstract fun getLayoutId(): Int
-
-    abstract fun injectDependencies(applicationComponent: ApplicationComponent)
 }

@@ -1,4 +1,4 @@
-package com.luismunyoz.catalogue.data.api.entity
+package com.luismunyoz.catalogue.data.entities.catalog
 
 class APICategory (
     val name: String,

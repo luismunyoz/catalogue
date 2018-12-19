@@ -6,10 +6,10 @@ import android.view.View
 import android.widget.Toast
 import com.luismunyoz.catalogue.R
 import com.luismunyoz.catalogue.di.ApplicationComponent
-import com.luismunyoz.catalogue.di.subcomponent.main.categoryproducts.CategoryProductsModule
 import com.luismunyoz.catalogue.ui.base.BaseFragment
 import com.luismunyoz.catalogue.ui.entity.UIProduct
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.adapter.CategoryProductsAdapter
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_categoryproducts.*
 import javax.inject.Inject
 
@@ -25,10 +25,7 @@ class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View, Cate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         name = arguments?.getString(ARG_NAME)
-    }
-
-    override fun injectDependencies(applicationComponent: ApplicationComponent) {
-        applicationComponent.plus(CategoryProductsModule()).injectTo(this)
+        AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

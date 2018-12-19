@@ -2,11 +2,12 @@ package com.luismunyoz.catalogue.di
 
 import android.content.Context
 import com.luismunyoz.catalogue.BuildConfig
-import com.luismunyoz.catalogue.data.api.APICatalogDataSet
-import com.luismunyoz.catalogue.data.api.ApiService
-import com.luismunyoz.catalogue.di.qualifier.ApiQualifier
+import com.luismunyoz.catalogue.data.entities.catalog.mapper.APIMapper
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.APICatalogDataSource
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.ApiService
+import com.luismunyoz.catalogue.di.qualifier.Remote
 import com.luismunyoz.catalogue.di.qualifier.ApplicationQualifier
-import com.luismunyoz.catalogue.repository.CatalogDataSet
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSource
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -14,6 +15,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
@@ -35,8 +37,9 @@ class DataModule {
     @Provides @Singleton
     fun provideRestAdapter(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-                .baseUrl("https://s3-ap-northeast-1.amazonaws.com")
+                .baseUrl("https://api.jsonbin.io")
                 .client(client)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }
@@ -44,6 +47,7 @@ class DataModule {
     @Provides @Singleton
     fun providesAPIService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
 
-    @Provides @Singleton @ApiQualifier
-    fun providesApiDataSource(apiService: ApiService): CatalogDataSet = APICatalogDataSet(apiService)
+    @Provides @Singleton @Remote
+    fun providesApiDataSource(apiService: ApiService, mapper: APIMapper): CatalogDataSource =
+            APICatalogDataSource(apiService, mapper)
 }

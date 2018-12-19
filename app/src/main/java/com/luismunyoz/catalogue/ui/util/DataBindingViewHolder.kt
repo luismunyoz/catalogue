@@ -18,26 +18,26 @@ class DataBindingViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHol
     }
 
     companion object {
-        @BindingAdapter("app:srcCompat")
+        @BindingAdapter("srcCompat")
         @JvmStatic
         fun setImage(imageView: ImageView, resourceId: Int){
             val drawable : Drawable? = VectorDrawableCompat.create(imageView.resources, resourceId, imageView.context.theme)
             imageView.setImageDrawable(drawable)
         }
 
-        @BindingAdapter("app:srcCompat")
+        @BindingAdapter("srcCompat")
         @JvmStatic
         fun setImage(imageView: ImageView, drawable: Drawable){
             imageView.setImageDrawable(drawable)
         }
 
-        @BindingAdapter("app:imageUrl")
+        @BindingAdapter("imageUrl")
         @JvmStatic
         fun loadImage(imageView: ImageView, url: String){
             Glide.with(imageView.context).load(url).into(imageView)
         }
 
-        @BindingAdapter("app:reducedImageUrl")
+        @BindingAdapter("reducedImageUrl")
         @JvmStatic
         fun reducedLoadImage(imageView: ImageView, url: String){
             Glide.with(imageView.context).load(url).sizeMultiplier(0.4f).into(imageView)

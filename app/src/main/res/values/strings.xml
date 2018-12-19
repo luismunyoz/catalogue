@@ -1,10 +1,9 @@
 <resources>
-    <string name="app_name">Catalogue</string>
+    <string name="app_name">Pics Catalogue</string>
     <string name="error_downloading_categories">Error downloading categories</string>
     <string name="loading">Loading…</string>
     <string name="no_products_available_for_this_category">No products available for this category</string>
     <string name="sad_face">:(</string>
     <string name="category_not_found">Category not found</string>
     <string name="no_connection">Connection not available</string>
-    <string name="sell">Sell</string>
 </resources>

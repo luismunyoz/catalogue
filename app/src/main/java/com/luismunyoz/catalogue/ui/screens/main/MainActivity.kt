@@ -2,32 +2,38 @@ package com.luismunyoz.catalogue.ui.screens.main
 
 import android.os.Bundle
 import android.support.design.widget.TabLayout
+import android.support.v4.app.Fragment
 import android.widget.Toast
 import com.luismunyoz.catalogue.R
-import com.luismunyoz.catalogue.di.ApplicationComponent
-import com.luismunyoz.catalogue.di.subcomponent.main.MainActivityModule
 import com.luismunyoz.catalogue.ui.base.BaseActivity
 import com.luismunyoz.catalogue.ui.entity.UICategory
 import com.luismunyoz.catalogue.ui.screens.main.adapter.CategoriesPagerAdapter
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity: BaseActivity<MainContract.View, MainContract.Presenter>(), MainContract.View {
+class MainActivity: BaseActivity<MainContract.View, MainContract.Presenter>(),
+        MainContract.View, HasSupportFragmentInjector {
 
     @Inject
     override lateinit var presenter : MainContract.Presenter
 
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentInjector
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(mainToolbar)
 
         presenter.start()
-    }
-
-    override fun injectDependencies(applicationComponent: ApplicationComponent) {
-        applicationComponent.plus(MainActivityModule(this)).injectTo(this)
     }
 
     override fun populateCategories(categories: List<UICategory>) {

@@ -1,10 +1,10 @@
 package com.luismunyoz.catalogue.di
 
-import com.luismunyoz.catalogue.di.subcomponent.main.MainActivityComponent
-import com.luismunyoz.catalogue.di.subcomponent.main.MainActivityModule
-import com.luismunyoz.catalogue.di.subcomponent.main.categoryproducts.CategoryProductsComponent
-import com.luismunyoz.catalogue.di.subcomponent.main.categoryproducts.CategoryProductsModule
+import android.app.Application
+import com.luismunyoz.catalogue.App
+import dagger.BindsInstance
 import dagger.Component
+import dagger.android.AndroidInjector
 import javax.inject.Singleton
 
 @Singleton
@@ -12,10 +12,17 @@ import javax.inject.Singleton
         ApplicationModule::class,
         DataModule::class,
         RepositoryModule::class,
-        DomainModule::class
+        DomainModule::class,
+        ActivityBuilderModule::class
 ))
-interface ApplicationComponent {
+interface ApplicationComponent: AndroidInjector<App> {
 
-    fun plus(module: MainActivityModule): MainActivityComponent
-    fun plus(module: CategoryProductsModule) : CategoryProductsComponent
+    @Component.Builder
+    interface Builder {
+
+        @BindsInstance
+        fun application(app: Application): Builder
+
+        fun build(): ApplicationComponent
+    }
 }

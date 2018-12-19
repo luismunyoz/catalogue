@@ -12,11 +12,8 @@ abstract class BaseActivity<V : BaseContract.View, P : BaseContract.Presenter<V>
     @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        injectDependencies(App.graph)
         presenter.attachView(this as V)
     }
-
-    abstract fun injectDependencies(applicationComponent: ApplicationComponent)
 
     override fun onDestroy() {
         super.onDestroy()

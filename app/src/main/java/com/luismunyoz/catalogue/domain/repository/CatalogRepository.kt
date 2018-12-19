@@ -2,12 +2,13 @@ package com.luismunyoz.catalogue.domain.repository
 
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
+import io.reactivex.Flowable
 
 interface CatalogRepository {
 
-    fun getCategories(): List<Category>
+    fun getCategories(): Flowable<List<Category>>
 
-    fun getCategoryByName(name: String) : Category?
+    fun getCategoryByName(name: String) : Flowable<Category>
 
-    fun getProducts(category: Category): List<Product>
+    fun getProducts(category: Category): Flowable<List<Product>>
 }

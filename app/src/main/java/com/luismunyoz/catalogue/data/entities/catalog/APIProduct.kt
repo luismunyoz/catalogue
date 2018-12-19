@@ -1,4 +1,4 @@
-package com.luismunyoz.catalogue.data.api.entity
+package com.luismunyoz.catalogue.data.entities.catalog
 
 import com.google.gson.annotations.SerializedName
 

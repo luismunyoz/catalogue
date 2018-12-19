@@ -4,17 +4,18 @@ import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.luismunyoz.catalogue.ui.entity.UICategory
 import com.luismunyoz.catalogue.ui.entity.UIProduct
+import javax.inject.Inject
 
-class UIMapper {
+class UIMapper @Inject constructor() {
 
-    @JvmName("transformCategories")
-    fun transform(categories: List<Category>) : List<UICategory> = categories.map { transform(it) }
+    @JvmName("mapCategories")
+    fun map(categories: List<Category>) : List<UICategory> = categories.map { map(it) }
 
-    fun transform(category: Category) : UICategory = UICategory(category.name)
+    fun map(category: Category) : UICategory = UICategory(category.name)
 
-    @JvmName("transformItems")
-    fun transform(products: List<Product>) : List<UIProduct> = products.map { transform(it) }
+    @JvmName("mapItems")
+    fun map(products: List<Product>) : List<UIProduct> = products.map { map(it) }
 
-    fun transform(product: Product) : UIProduct = UIProduct(product.id, product.name, product.isSoldOut(), product.numLikes, product.numComments, product.price, product.photo)
+    fun map(product: Product) : UIProduct = UIProduct(product.id, product.name, product.isSoldOut(), product.numLikes, product.numComments, product.price, product.photo)
 
 }

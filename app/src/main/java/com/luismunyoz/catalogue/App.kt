@@ -1,25 +1,26 @@
 package com.luismunyoz.catalogue
 
+import android.app.Activity
 import android.app.Application
-import com.luismunyoz.catalogue.di.ApplicationComponent
-import com.luismunyoz.catalogue.di.ApplicationModule
 import com.luismunyoz.catalogue.di.DaggerApplicationComponent
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasActivityInjector
+import javax.inject.Inject
 
-class App : Application() {
+class App : Application(), HasActivityInjector {
 
-    companion object {
-        lateinit var graph: ApplicationComponent
-    }
+    @Inject
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    override fun activityInjector(): AndroidInjector<Activity> = activityInjector
 
     override fun onCreate() {
         super.onCreate()
-        initializeDagger()
-    }
-
-    fun initializeDagger() {
-        graph = DaggerApplicationComponent.builder()
-                .applicationModule(ApplicationModule(this))
+        DaggerApplicationComponent.builder()
+                .application(this)
                 .build()
+                .inject(this)
     }
 
 }

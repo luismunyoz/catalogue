@@ -3,16 +3,16 @@ package com.luismunyoz.catalogue.ui.screens.main.categoryproducts
 import com.luismunyoz.catalogue.RxSchedulersOverrideRule
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
-import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameInteractor
-import com.luismunyoz.catalogue.domain.interactor.GetProductsInteractor
+import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameUseCase
+import com.luismunyoz.catalogue.domain.interactor.GetProductsUseCase
 import com.luismunyoz.catalogue.domain.interactor.error.CategoryNotFoundError
 import com.luismunyoz.catalogue.ui.entity.mapper.UIMapper
+import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.presenter.CategoryProductsPresenter
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
-import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,9 +27,9 @@ class CategoryProductsPresenterTest {
     @Mock
     var view: CategoryProductsContract.View = mock()
     @Mock
-    var getProductsInteractor: GetProductsInteractor = mock()
+    var getProductsInteractor: GetProductsUseCase = mock()
     @Mock
-    var getCategoryByNameInteractor: GetCategoryByNameInteractor = mock()
+    var getCategoryByNameInteractor: GetCategoryByNameUseCase = mock()
 
     var uiMapper = UIMapper()
     var category = Category("sample", "http://url")
@@ -105,7 +105,7 @@ class CategoryProductsPresenterTest {
     fun `should populate products when loaded`(){
         presenter.start("sample")
 
-        verify(view).populateProducts(uiMapper.transform(products))
+        verify(view).populateProducts(uiMapper.map(products))
     }
 
     @Test

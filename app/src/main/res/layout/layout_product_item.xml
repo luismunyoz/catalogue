@@ -91,7 +91,8 @@
                     app:layout_constraintTop_toBottomOf="@+id/productItemImage"
                     tools:text="$ 20"
                     android:layout_marginTop="8dp"
-                    android:textSize="15sp"/>
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>
     </FrameLayout>
