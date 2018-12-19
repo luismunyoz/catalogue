@@ -1,151 +1,155 @@
 package com.luismunyoz.catalogue.ui.screens.main.categoryproducts
 
-import com.luismunyoz.catalogue.RxSchedulersOverrideRule
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameUseCase
 import com.luismunyoz.catalogue.domain.interactor.GetProductsUseCase
-import com.luismunyoz.catalogue.domain.interactor.error.CategoryNotFoundError
-import com.luismunyoz.catalogue.ui.entity.mapper.UIMapper
+import com.luismunyoz.catalogue.ui.entity.UIProduct
+import com.luismunyoz.catalogue.ui.entity.mapper.ProductUIMapper
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.presenter.CategoryProductsPresenter
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.reset
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
-import io.reactivex.Single
+import com.nhaarman.mockito_kotlin.*
+import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.mockito.Mockito
 
 class CategoryProductsPresenterTest {
 
-    @Rule
-    @JvmField
-    val mOverrideSchedulersRule = RxSchedulersOverrideRule()
-
-    @Mock
     var view: CategoryProductsContract.View = mock()
-    @Mock
-    var getProductsInteractor: GetProductsUseCase = mock()
-    @Mock
-    var getCategoryByNameInteractor: GetCategoryByNameUseCase = mock()
+    var getProductsUseCase: GetProductsUseCase = mock()
+    var getCategoryByNameUseCase: GetCategoryByNameUseCase = mock()
+    var mapper : ProductUIMapper = mock()
+    private val scheduler: Scheduler = Schedulers.trampoline()
 
-    var uiMapper = UIMapper()
-    var category = Category("sample", "http://url")
-    var products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
-
-    private val presenter = CategoryProductsPresenter(getCategoryByNameInteractor, getProductsInteractor, uiMapper)
+    lateinit var presenter: CategoryProductsPresenter
 
     @Before
     fun setUp(){
-        reset(view, getProductsInteractor, getCategoryByNameInteractor)
-        presenter.attachView(view)
-
-        whenever(getCategoryByNameInteractor.invoke()).thenReturn(
-                Single.just(category)
-        )
-        whenever(getProductsInteractor.invoke()).thenReturn(
-                Single.just(products)
-        )
+        reset(view, getProductsUseCase, getCategoryByNameUseCase, mapper)
+        presenter = CategoryProductsPresenter(getCategoryByNameUseCase, getProductsUseCase, mapper, scheduler).also {
+            it.attachView(view)
+        }
     }
 
     @Test
     fun `should download category on start`(){
+        val category = Category("name", "hello")
+
+        ArrangeBuilder()
+                .withGetCategoryByNameSuccess(category)
+
         presenter.start("sample")
 
-        verify(getCategoryByNameInteractor).invoke()
+        verify(getCategoryByNameUseCase).execute(any())
     }
 
     @Test
-    fun `should show loader when loading category`(){
-        presenter.start("sample")
+    fun `should download the category and then download the category products`(){
+        val category = Category("name", "hello")
+        val products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+        val mapped = listOf(UIProduct("0", "sample", true, 0, 0, 0, ""))
 
-        verify(view).showLoading(true)
+        ArrangeBuilder()
+                .withGetCategoryByNameSuccess(category)
+                .withGetProductsSuccess(products)
+                .withMapperResponse(mapped)
+
+        presenter.start("name")
+
+        inOrder(getCategoryByNameUseCase, getProductsUseCase, mapper, view) {
+            verify(getCategoryByNameUseCase).execute("name")
+            verify(view).showLoading(true)
+            verify(getProductsUseCase).execute(category)
+            verify(mapper).map(products)
+            verify(view).populateProducts(mapped)
+            verify(view).showLoading(false)
+        }
     }
 
     @Test
-    fun `should download category products when category downloaded`(){
-        presenter.start("sample")
+    fun `should download the category and show no products if there are no products`(){
+        val category = Category("name", "hello")
 
-        verify(getProductsInteractor).invoke()
+        ArrangeBuilder()
+                .withGetCategoryByNameSuccess(category)
+                .withGetProductsSuccess(listOf())
+
+        presenter.start("name")
+
+        inOrder(getCategoryByNameUseCase, getProductsUseCase, mapper, view) {
+            verify(getCategoryByNameUseCase).execute("name")
+            verify(view).showLoading(true)
+            verify(getProductsUseCase).execute(category)
+            verify(view).showNoProducts()
+            verify(view).showLoading(false)
+        }
     }
 
     @Test
-    fun `should show error if category not found`(){
-        whenever(getCategoryByNameInteractor.invoke()).thenReturn(
-                Single.error(CategoryNotFoundError())
-        )
-        presenter.start("not found")
+    fun `should download the category and show errors if products download fails`(){
+        val category = Category("name", "hello")
 
-        verify(view).showErrorNoCategoryFound()
+        ArrangeBuilder()
+                .withGetCategoryByNameSuccess(category)
+                .withGetProductsError(Throwable())
+
+        presenter.start("name")
+
+        inOrder(getCategoryByNameUseCase, getProductsUseCase, mapper, view) {
+            verify(getCategoryByNameUseCase).execute("name")
+            verify(view).showLoading(true)
+            verify(getProductsUseCase).execute(category)
+            verify(view).showErrorNoConnection()
+            verify(view).showLoading(false)
+        }
     }
 
     @Test
-    fun `should show error if category no connection`(){
-        whenever(getCategoryByNameInteractor.invoke()).thenReturn(
-                Single.error(Throwable())
-        )
-        presenter.start("error")
+    fun `should show error if category download fails`(){
 
-        verify(view).showErrorNoConnection()
+        ArrangeBuilder()
+                .withGetCategoryByNameError(Throwable())
+
+        presenter.start("name")
+
+        inOrder(getCategoryByNameUseCase, getProductsUseCase, mapper, view) {
+            verify(getCategoryByNameUseCase).execute("name")
+            verify(view).showLoading(true)
+            verify(view).showLoading(false)
+            verify(view).showErrorNoConnection()
+        }
     }
 
-    @Test
-    fun `should hide loader when error loading category`(){
-        whenever(getCategoryByNameInteractor.invoke()).thenReturn(
-                Single.error(Throwable())
-        )
-        presenter.start("error")
 
-        verify(view).showLoading(false)
+    inner class ArrangeBuilder {
+
+        fun withGetCategoryByNameSuccess(category: Category) : ArrangeBuilder {
+            doAnswer { Flowable.just(category) }.whenever(getCategoryByNameUseCase).execute(any())
+            return this
+        }
+
+        fun withGetCategoryByNameError(error: Throwable): ArrangeBuilder {
+            whenever(getCategoryByNameUseCase.execute(any()))
+                    .thenReturn(Flowable.error(error))
+            return this
+        }
+
+        fun withGetProductsSuccess(products: List<Product>) : ArrangeBuilder {
+            doAnswer { Flowable.just(products) }.whenever(getProductsUseCase).execute(any())
+            return this
+        }
+
+        fun withGetProductsError(error: Throwable): ArrangeBuilder {
+            whenever(getProductsUseCase.execute(any()))
+                    .thenReturn(Flowable.error(error))
+            return this
+        }
+
+        fun withMapperResponse(uiProducts: List<UIProduct>): ArrangeBuilder {
+            doAnswer { uiProducts }.whenever(mapper).map(Mockito.anyList())
+            return this
+        }
     }
-
-    @Test
-    fun `should populate products when loaded`(){
-        presenter.start("sample")
-
-        verify(view).populateProducts(uiMapper.map(products))
-    }
-
-    @Test
-    fun `should hide loader when products loaded`(){
-        presenter.start("sample")
-
-        verify(view).showLoading(false)
-    }
-
-    @Test
-    fun `should hide loader if products load fails`(){
-        whenever(getProductsInteractor.invoke()).thenReturn(
-                Single.error(Throwable())
-        )
-
-        presenter.start("error")
-
-        verify(view).showLoading(false)
-    }
-
-    @Test
-    fun `should show error if products load fails`(){
-        whenever(getProductsInteractor.invoke()).thenReturn(
-                Single.error(Throwable())
-        )
-
-        presenter.start("error")
-
-        verify(view).showErrorNoConnection()
-    }
-
-    @Test
-    fun `should show empty view if products list is empty`(){
-        whenever(getProductsInteractor.invoke()).thenReturn(
-                Single.just(listOf())
-        )
-
-        presenter.start("empty")
-
-        verify(view).showNoProducts()
-    }
-
 }

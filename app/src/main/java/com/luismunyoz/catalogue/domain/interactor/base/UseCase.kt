@@ -6,5 +6,5 @@ import io.reactivex.Single
 
 interface UseCase<T> {
 
-    operator fun invoke(): Flowable<T>
+    fun execute(): Flowable<T>
 }

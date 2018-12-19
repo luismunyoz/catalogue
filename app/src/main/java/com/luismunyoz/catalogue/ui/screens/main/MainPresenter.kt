@@ -1,18 +1,16 @@
 package com.luismunyoz.catalogue.ui.screens.main
 
-import com.luismunyoz.catalogue.domain.entity.Category
+import com.luismunyoz.catalogue.di.qualifier.UI
 import com.luismunyoz.catalogue.domain.interactor.GetCategoriesUseCase
 import com.luismunyoz.catalogue.ui.base.BasePresenter
-import com.luismunyoz.catalogue.ui.entity.mapper.UIMapper
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.luismunyoz.catalogue.ui.entity.mapper.CategoryUIMapper
+import io.reactivex.Scheduler
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(val getCategoriesInteractor: GetCategoriesUseCase,
-                                        val uiMapper: UIMapper) : BasePresenter<MainContract.View>(),
+                                        val mapper: CategoryUIMapper,
+                                        @UI val scheduler: Scheduler) : BasePresenter<MainContract.View>(),
         MainContract.Presenter {
-
-    var categories: List<Category> = listOf()
 
     override fun start() {
         downloadCategories()
@@ -21,12 +19,10 @@ class MainPresenter @Inject constructor(val getCategoriesInteractor: GetCategori
     private fun downloadCategories() {
         disposable.add(
                 getCategoriesInteractor
-                        .invoke()
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .execute()
+                        .observeOn(scheduler)
                         .subscribe({
-                            categories = it
-                            getView()?.populateCategories(uiMapper.map(it))
+                            getView()?.populateCategories(mapper.map(it))
                         }, {
                             getView()?.showErrorNoConnection()
                         })

@@ -1,68 +1,97 @@
 package com.luismunyoz.catalogue.ui.screens.main
 
-import com.luismunyoz.catalogue.RxSchedulersOverrideRule
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.interactor.GetCategoriesUseCase
-import com.luismunyoz.catalogue.ui.entity.mapper.UIMapper
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.reset
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.luismunyoz.catalogue.ui.entity.UICategory
+import com.luismunyoz.catalogue.ui.entity.mapper.CategoryUIMapper
+import com.nhaarman.mockito_kotlin.*
+import io.reactivex.Flowable
+import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.mockito.Mockito
 
 class MainPresenterTest {
 
-    @Rule
-    @JvmField
-    val mOverrideSchedulersRule = RxSchedulersOverrideRule()
-
-    @Mock
     var view: MainContract.View = mock()
-    @Mock
-    var getCategoriesInteractor: GetCategoriesUseCase = mock()
+    var getCategoriesUseCase: GetCategoriesUseCase = mock()
+    var mapper : CategoryUIMapper = mock()
+    private val scheduler: Scheduler = Schedulers.trampoline()
 
-    var uiMapper = UIMapper()
-    var categories = listOf(Category("1", ""), Category("2", ""))
-
-    private val presenter = MainPresenter(getCategoriesInteractor, uiMapper)
+    private lateinit var presenter: MainPresenter
 
     @Before
     fun setUp(){
-        reset(view, getCategoriesInteractor)
-        presenter.attachView(view)
-
-        whenever(getCategoriesInteractor.invoke()).thenReturn(
-                Single.just(categories)
-        )
+        reset(view, getCategoriesUseCase, mapper)
+        presenter = MainPresenter(getCategoriesUseCase, mapper, scheduler).also { it.attachView(view) }
     }
 
     @Test
     fun `should download categories on start`(){
+        ArrangeBuilder()
+                .withGetCategoriesResponse(buildCategories())
+
         presenter.start()
 
-        verify(getCategoriesInteractor).invoke()
+        verify(getCategoriesUseCase).execute()
     }
 
     @Test
     fun `should populate categories when downloaded`(){
+        val categories = buildCategories()
+        val mapped = listOf(UICategory("1"), UICategory("2"))
+
+        ArrangeBuilder()
+                .withGetCategoriesResponse(categories)
+                .withMapperResponse(mapped)
+
         presenter.start()
 
-        verify(view).populateCategories(uiMapper.map(categories))
+        inOrder(getCategoriesUseCase, view, mapper){
+            verify(getCategoriesUseCase).execute()
+            verify(mapper).map(categories)
+            verify(view).populateCategories(mapped)
+        }
     }
 
     @Test
     fun `should show error when error downloading categories`(){
 
-        whenever(getCategoriesInteractor.invoke()).thenReturn(
-                Single.error(Throwable())
-        )
+        ArrangeBuilder()
+                .withGetCategoriesError(Throwable())
 
         presenter.start()
 
-        verify(view).showErrorNoConnection()
+        inOrder(getCategoriesUseCase, view){
+            verify(getCategoriesUseCase).execute()
+            verify(view).showErrorNoConnection()
+        }
+    }
+
+    private fun buildCategories(): List<Category> {
+        return listOf(Category("1", "http://www.first.com"),
+                Category("2", "http://www.second.com"))
+    }
+
+    inner class ArrangeBuilder {
+
+        fun withGetCategoriesResponse(list: List<Category>) : ArrangeBuilder {
+            doAnswer { Flowable.just(list) }.whenever(getCategoriesUseCase).execute()
+            return this
+        }
+
+        fun withGetCategoriesError(error: Throwable): ArrangeBuilder {
+            whenever(getCategoriesUseCase.execute())
+                    .thenReturn(Flowable.error(error))
+            return this
+        }
+
+        fun withMapperResponse(uiCategories: List<UICategory>): ArrangeBuilder {
+            doAnswer { uiCategories }.whenever(mapper).map(Mockito.anyList())
+            return this
+        }
     }
 }

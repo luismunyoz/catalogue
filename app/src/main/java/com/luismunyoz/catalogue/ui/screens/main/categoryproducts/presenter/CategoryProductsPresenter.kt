@@ -6,7 +6,8 @@ import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameUseCase
 import com.luismunyoz.catalogue.domain.interactor.GetProductsUseCase
 import com.luismunyoz.catalogue.domain.interactor.error.CategoryNotFoundError
 import com.luismunyoz.catalogue.ui.base.BasePresenter
-import com.luismunyoz.catalogue.ui.entity.mapper.UIMapper
+import com.luismunyoz.catalogue.ui.entity.mapper.CategoryUIMapper
+import com.luismunyoz.catalogue.ui.entity.mapper.ProductUIMapper
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.CategoryProductsContract
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 class CategoryProductsPresenter @Inject constructor(val getCategoryByNameUseCase: GetCategoryByNameUseCase,
                                                     val getProductsUseCase: GetProductsUseCase,
-                                                    val uiMapper: UIMapper,
+                                                    val mapper: ProductUIMapper,
                                                     @UI val scheduler: Scheduler)
     : BasePresenter<CategoryProductsContract.View>(), CategoryProductsContract.Presenter {
 
@@ -48,7 +49,7 @@ class CategoryProductsPresenter @Inject constructor(val getCategoryByNameUseCase
                         .doFinally { getView()?.showLoading(false) }
                         .subscribe({ products ->
                             if (products.isNotEmpty()) {
-                                getView()?.populateProducts(uiMapper.map(products))
+                                getView()?.populateProducts(mapper.map(products))
                             } else {
                                 getView()?.showNoProducts()
                             }
