@@ -1,10 +1,10 @@
 package com.luismunyoz.catalogue.ui.util
 
-import android.databinding.BindingAdapter
-import android.databinding.ViewDataBinding
+import androidx.databinding.BindingAdapter
+import androidx.databinding.ViewDataBinding
 import android.graphics.drawable.Drawable
-import android.support.graphics.drawable.VectorDrawableCompat
-import android.support.v7.widget.RecyclerView
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.luismunyoz.catalogue.BR

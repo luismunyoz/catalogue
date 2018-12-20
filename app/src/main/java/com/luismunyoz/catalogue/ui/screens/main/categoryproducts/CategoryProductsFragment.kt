@@ -1,9 +1,10 @@
 package com.luismunyoz.catalogue.ui.screens.main.categoryproducts
 
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.luismunyoz.catalogue.R
 import com.luismunyoz.catalogue.ui.base.BaseFragment
 import com.luismunyoz.catalogue.ui.entity.UIProduct
@@ -56,7 +57,7 @@ class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View,
     override fun populateProducts(products: List<UIProduct>) {
         val adapter = CategoryProductsAdapter(products)
         categoryproductsList.layoutManager = GridLayoutManager(context, 2,
-                GridLayoutManager.VERTICAL, false)
+                RecyclerView.VERTICAL, false)
         categoryproductsList.adapter = adapter
     }
 

@@ -1,7 +1,7 @@
 package com.luismunyoz.catalogue.di
 
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.luismunyoz.catalogue.di.scope.ActivityScope
 import dagger.Module
 import dagger.Provides
