@@ -5,7 +5,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.Toast
 import com.luismunyoz.catalogue.R
-import com.luismunyoz.catalogue.di.ApplicationComponent
 import com.luismunyoz.catalogue.ui.base.BaseFragment
 import com.luismunyoz.catalogue.ui.entity.UIProduct
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.adapter.CategoryProductsAdapter

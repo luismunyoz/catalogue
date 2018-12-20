@@ -1,7 +1,7 @@
 package com.luismunyoz.catalogue.ui.screens.main.categoryproducts.adapter
 
 import com.luismunyoz.catalogue.R
-import com.luismunyoz.catalogue.ui.base.BaseAdapter
+import com.luismunyoz.catalogue.ui.util.list.BaseAdapter
 import com.luismunyoz.catalogue.ui.entity.UIProduct
 
 class CategoryProductsAdapter(var items: List<UIProduct>): BaseAdapter() {
