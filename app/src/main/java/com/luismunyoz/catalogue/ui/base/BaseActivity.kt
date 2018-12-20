@@ -5,7 +5,8 @@ import android.support.v7.app.AppCompatActivity
 import com.luismunyoz.catalogue.App
 import com.luismunyoz.catalogue.di.ApplicationComponent
 
-abstract class BaseActivity<V : BaseContract.View, P : BaseContract.Presenter<V>> : AppCompatActivity(), BaseContract.View {
+abstract class BaseActivity<V : BaseContract.View, P : BaseContract.Presenter<V>>
+    : AppCompatActivity(), BaseContract.View {
 
     open lateinit var presenter: P
 

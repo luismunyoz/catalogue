@@ -23,7 +23,7 @@ import javax.inject.Singleton
 class DataModule {
 
     @Provides @Singleton
-    fun provideCache(@ApplicationQualifier context: Context) = Cache(context.cacheDir, 10 * 1024 * 1024.toLong())
+    fun provideCache(@ApplicationQualifier context: Context) = Cache(context.cacheDir, CACHE_SIZE)
 
     @Provides @Singleton
     fun provideOkHttpClient(cache: Cache): OkHttpClient =
@@ -50,4 +50,8 @@ class DataModule {
     @Provides @Singleton @Remote
     fun providesApiDataSource(apiService: ApiService, mapper: APIMapper): CatalogDataSource =
             APICatalogDataSource(apiService, mapper)
+
+    companion object {
+        const val CACHE_SIZE = 10 * 1024 * 1024L
+    }
 }

@@ -9,12 +9,13 @@ import javax.inject.Inject
 class APIMapper @Inject constructor() {
 
     @JvmName("mapCategories")
-    fun map(APICategories: List<APICategory>) : List<Category> = APICategories.map { map(it) }
+    fun map(categories: List<APICategory>) : List<Category> = categories.map { map(it) }
 
-    fun map(APICategory: APICategory) : Category = Category(APICategory.name, APICategory.data)
+    fun map(category: APICategory) : Category = Category(category.name, category.data)
 
     @JvmName("mapItems")
-    fun map(APIProducts: List<APIProduct>) : List<Product> = APIProducts.map { map(it) }
+    fun map(products: List<APIProduct>) : List<Product> = products.map { map(it) }
 
-    fun map(APIProduct: APIProduct) : Product = Product(APIProduct.id, APIProduct.name, APIProduct.status, APIProduct.numLikes, APIProduct.numComments, APIProduct.price, APIProduct.photo)
+    fun map(product: APIProduct) : Product = Product(product.id, product.name, product.status,
+            product.numLikes, product.numComments, product.price, product.photo)
 }

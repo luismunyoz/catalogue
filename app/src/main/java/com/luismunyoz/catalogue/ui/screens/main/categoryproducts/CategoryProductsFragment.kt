@@ -13,7 +13,8 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_categoryproducts.*
 import javax.inject.Inject
 
-class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View, CategoryProductsContract.Presenter>(), CategoryProductsContract.View {
+class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View,
+        CategoryProductsContract.Presenter>(), CategoryProductsContract.View {
 
     @Inject
     override lateinit var presenter: CategoryProductsContract.Presenter
@@ -55,12 +56,13 @@ class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View, Cate
 
     override fun populateProducts(products: List<UIProduct>) {
         val adapter = CategoryProductsAdapter(products)
-        categoryproductsList.layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        categoryproductsList.layoutManager = GridLayoutManager(context, 2,
+                GridLayoutManager.VERTICAL, false)
         categoryproductsList.adapter = adapter
     }
 
     companion object {
-        private val ARG_NAME = "NAME"
+        private const val ARG_NAME = "NAME"
 
         fun newInstance(categoryName : String) : CategoryProductsFragment {
             val args: Bundle = Bundle()

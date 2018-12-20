@@ -10,6 +10,7 @@ class ProductUIMapper @Inject constructor() {
 
     fun map(products: List<Product>) : List<UIProduct> = products.map { map(it) }
 
-    fun map(product: Product) : UIProduct = UIProduct(product.id, product.name, product.isSoldOut(), product.numLikes, product.numComments, product.price, product.photo)
+    fun map(product: Product) : UIProduct = UIProduct(product.id, product.name, product.isSoldOut(),
+            product.numLikes, product.numComments, product.price, product.photo)
 
 }

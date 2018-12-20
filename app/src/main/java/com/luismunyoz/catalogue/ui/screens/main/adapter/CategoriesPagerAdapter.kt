@@ -7,13 +7,15 @@ import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.ui.entity.UICategory
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.CategoryProductsFragment
 
-class CategoriesPagerAdapter(val fragmentManager: FragmentManager, val categories: List<UICategory>): FragmentStatePagerAdapter(fragmentManager) {
+class CategoriesPagerAdapter(val fragmentManager: FragmentManager,
+                             val categories: List<UICategory>)
+    : FragmentStatePagerAdapter(fragmentManager) {
 
     val fragments: Array<Fragment?> = arrayOfNulls(categories.size)
 
     override fun getItem(position: Int): Fragment {
         if(fragments[position] == null){
-            fragments[position] = CategoryProductsFragment.newInstance(categories.get(position).name)
+            fragments[position] = CategoryProductsFragment.newInstance(categories[position].name)
         }
         return fragments[position]!!
     }
