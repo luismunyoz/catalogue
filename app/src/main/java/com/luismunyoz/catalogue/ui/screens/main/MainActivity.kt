@@ -64,6 +64,15 @@ class MainActivity: BaseActivity<MainContract.View, MainContract.Presenter>(),
     private fun populatePager(categories: List<UICategory>) {
         val adapter = CategoriesPagerAdapter(supportFragmentManager, categories)
         mainPager.adapter = adapter
+        mainPager.addOnPageChangeListener( object: ViewPager.OnPageChangeListener {
+            override fun onPageSelected(p0: Int) {
+                mainTabs.getTabAt(p0)?.select()
+            }
+
+            override fun onPageScrollStateChanged(p0: Int) {}
+
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
+        })
     }
 
     override fun showErrorNoConnection() {
