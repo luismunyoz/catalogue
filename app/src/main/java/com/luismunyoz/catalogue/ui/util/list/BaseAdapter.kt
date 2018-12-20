@@ -1,4 +1,4 @@
-package com.luismunyoz.catalogue.ui.base
+package com.luismunyoz.catalogue.ui.util.list
 
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding

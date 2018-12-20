@@ -33,6 +33,10 @@ android {
             includeAndroidResources = true
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 // Required for annotation processing plugins like Dagger
