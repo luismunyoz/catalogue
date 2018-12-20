@@ -1,9 +1,7 @@
 package com.luismunyoz.catalogue.ui.base
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import com.luismunyoz.catalogue.App
-import com.luismunyoz.catalogue.di.ApplicationComponent
+import androidx.appcompat.app.AppCompatActivity
 
 abstract class BaseActivity<V : BaseContract.View, P : BaseContract.Presenter<V>>
     : AppCompatActivity(), BaseContract.View {

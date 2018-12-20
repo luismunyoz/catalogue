@@ -1,8 +1,8 @@
 package com.luismunyoz.catalogue.ui.screens.main
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
+import com.google.android.material.tabs.TabLayout
+import androidx.fragment.app.Fragment
 import android.widget.Toast
 import com.luismunyoz.catalogue.R
 import com.luismunyoz.catalogue.ui.base.BaseActivity

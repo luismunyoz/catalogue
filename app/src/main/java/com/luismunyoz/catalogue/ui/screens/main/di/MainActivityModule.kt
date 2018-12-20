@@ -1,6 +1,6 @@
 package com.luismunyoz.catalogue.ui.screens.main.di
 
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.FragmentActivity
 import com.luismunyoz.catalogue.ui.screens.main.MainActivity
 import com.luismunyoz.catalogue.ui.screens.main.MainContract
 import com.luismunyoz.catalogue.ui.screens.main.MainPresenter
