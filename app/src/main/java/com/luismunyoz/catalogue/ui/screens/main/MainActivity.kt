@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.google.android.material.tabs.TabLayout
 import androidx.fragment.app.Fragment
 import android.widget.Toast
+import androidx.viewpager.widget.ViewPager
 import com.luismunyoz.catalogue.R
 import com.luismunyoz.catalogue.ui.base.BaseActivity
 import com.luismunyoz.catalogue.ui.entity.UICategory
