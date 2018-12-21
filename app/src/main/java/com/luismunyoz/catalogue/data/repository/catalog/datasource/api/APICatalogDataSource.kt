@@ -10,9 +10,9 @@ class APICatalogDataSource(val apiService: ApiService,
                            val mapper: APIMapper) : CatalogDataSource {
 
     override fun requestCategories(): Flowable<List<Category>> =
-        apiService.getCategories().map { mapper.map(it) }
+        apiService.getCategories().map { mapper.mapCategories(it) }
 
     override fun requestProductsForCategory(category: Category): Flowable<List<Product>> =
-        apiService.getItems(category.data).map { mapper.map(it) }
+        apiService.getItems(category.data).map { mapper.mapProducts(it) }
 
 }
