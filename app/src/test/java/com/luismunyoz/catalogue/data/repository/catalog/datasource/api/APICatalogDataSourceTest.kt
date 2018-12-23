@@ -1,19 +1,16 @@
 package com.luismunyoz.catalogue.data.repository.catalog.datasource.api
 
-import com.luismunyoz.catalogue.data.entities.catalog.APICategory
-import com.luismunyoz.catalogue.data.entities.catalog.APIProduct
-import com.luismunyoz.catalogue.data.entities.catalog.mapper.APIMapper
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.CacheCategory
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.CacheProduct
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.mapper.APIMapper
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
-import com.luismunyoz.catalogue.ui.entity.UIProduct
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Flowable
-import org.junit.Assert.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 
 class APICatalogDataSourceTest {
 
@@ -35,7 +32,7 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
-            val categories = listOf(APICategory("1", "1"))
+            val categories = listOf(CacheCategory("1", "1"))
             val mapped = listOf(Category("1", "1"))
 
             ArrangeBuilder()
@@ -73,7 +70,7 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
-            val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
+            val products = listOf(CacheProduct("0", "sample", "sold_out", 0, 0, 0, ""))
             val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
@@ -107,7 +104,7 @@ class APICatalogDataSourceTest {
 
     inner class ArrangeBuilder {
 
-        fun withServiceCategoriesResponse(response: List<APICategory>): ArrangeBuilder {
+        fun withServiceCategoriesResponse(response: List<CacheCategory>): ArrangeBuilder {
             doAnswer { Flowable.just(response) }.whenever(apiService).getCategories()
             return this
         }
@@ -117,7 +114,7 @@ class APICatalogDataSourceTest {
             return this
         }
 
-        fun withServiceProductsResponse(response: List<APIProduct>): ArrangeBuilder {
+        fun withServiceProductsResponse(response: List<CacheProduct>): ArrangeBuilder {
             doAnswer { Flowable.just(response) }.whenever(apiService).getItems(any())
             return this
         }
