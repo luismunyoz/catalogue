@@ -8,7 +8,10 @@ import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.ApiServic
 import com.luismunyoz.catalogue.di.qualifier.Remote
 import com.luismunyoz.catalogue.di.qualifier.ApplicationQualifier
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSource
-import com.pacoworks.rxpaper.RxPaperBook
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.cache.model.CacheCatalogDataSource
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.cache.model.mapper.CacheMapper
+import com.luismunyoz.catalogue.di.qualifier.Cached
+import com.pacoworks.rxpaper2.RxPaperBook
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -54,6 +57,10 @@ class DataModule {
 
     @Provides @Singleton
     fun provideCategoriesCache() : RxPaperBook = RxPaperBook.with("categories")
+
+    @Provides @Singleton @Cached
+    fun providesCacheDataSource(paperBook: RxPaperBook, mapper: CacheMapper): CatalogDataSource =
+            CacheCatalogDataSource(paperBook, mapper)
 
     companion object {
         const val CACHE_SIZE = 10 * 1024 * 1024L

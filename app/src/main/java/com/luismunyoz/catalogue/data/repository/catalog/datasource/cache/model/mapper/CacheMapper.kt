@@ -19,5 +19,14 @@ class CacheMapper @Inject constructor() {
             product.numLikes, product.numComments, product.price,
             product.photo ?: "")
 
-    fun map(category: Category) : CacheCategory = CacheCategory()
+    fun map(category: Category) : CacheCategory = CacheCategory(category.id, category.name)
+
+    fun map(product: Product) : CacheProduct = CacheProduct(
+            product.id, product.name, product.status, product. numLikes, product.numComments,
+            product.price, product.photo
+    )
+
+    fun map(products: List<Product>) = products.map { map(it) }
+
+    fun mapReverseCategories(categories: List<Category>) = categories.map { map(it) }
 }

@@ -2,7 +2,6 @@ package com.luismunyoz.catalogue.ui.screens.main.categoryproducts
 
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
-import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameUseCase
 import com.luismunyoz.catalogue.domain.interactor.GetProductsUseCase
 import com.luismunyoz.catalogue.ui.entity.UIProduct
 import com.luismunyoz.catalogue.ui.entity.mapper.ProductUIMapper
@@ -19,7 +18,6 @@ class CategoryProductsPresenterTest {
 
     var view: CategoryProductsContract.View = mock()
     var getProductsUseCase: GetProductsUseCase = mock()
-    var getCategoryByNameUseCase: GetCategoryByNameUseCase = mock()
     var mapper : ProductUIMapper = mock()
     private val scheduler: Scheduler = Schedulers.trampoline()
 
@@ -27,22 +25,21 @@ class CategoryProductsPresenterTest {
 
     @Before
     fun setUp(){
-        reset(view, getProductsUseCase, getCategoryByNameUseCase, mapper)
-        presenter = CategoryProductsPresenter(getCategoryByNameUseCase, getProductsUseCase, mapper, scheduler).also {
+        reset(view, getProductsUseCase, mapper)
+        presenter = CategoryProductsPresenter(getProductsUseCase, mapper, scheduler).also {
             it.attachView(view)
         }
     }
 
     @Test
     fun `should download category on start`(){
-        val category = Category("name", "hello")
+        val category = Category(1, "name")
 
         ArrangeBuilder()
                 .withGetCategoryByNameSuccess(category)
 
         presenter.start("sample")
 
-        verify(getCategoryByNameUseCase).execute(any())
     }
 
     @Test

@@ -11,7 +11,7 @@ interface CatalogDataSource {
 
     fun requestProductsForCategory(categoryId: Int): Single<List<Product>>
 
-    fun saveCategory(category: Category): Completable
+    fun saveCategories(categories: List<Category>): Completable
 
     fun saveCategoryProducts(categoryId: Int, products: List<Product>): Completable
 }

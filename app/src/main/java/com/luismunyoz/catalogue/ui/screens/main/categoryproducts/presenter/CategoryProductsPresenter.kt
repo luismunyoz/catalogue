@@ -1,52 +1,31 @@
 package com.luismunyoz.catalogue.ui.screens.main.categoryproducts.presenter
 
 import com.luismunyoz.catalogue.di.qualifier.UI
-import com.luismunyoz.catalogue.domain.entity.Category
-import com.luismunyoz.catalogue.domain.interactor.GetCategoryByNameUseCase
 import com.luismunyoz.catalogue.domain.interactor.GetProductsUseCase
-import com.luismunyoz.catalogue.domain.interactor.error.CategoryNotFoundError
 import com.luismunyoz.catalogue.ui.base.BasePresenter
-import com.luismunyoz.catalogue.ui.entity.mapper.CategoryUIMapper
 import com.luismunyoz.catalogue.ui.entity.mapper.ProductUIMapper
 import com.luismunyoz.catalogue.ui.screens.main.categoryproducts.CategoryProductsContract
 import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CategoryProductsPresenter @Inject constructor(val getCategoryByNameUseCase: GetCategoryByNameUseCase,
-                                                    val getProductsUseCase: GetProductsUseCase,
-                                                    val mapper: ProductUIMapper,
-                                                    @UI val scheduler: Scheduler)
+class CategoryProductsPresenter @Inject constructor(private val getProductsUseCase: GetProductsUseCase,
+                                                    private val mapper: ProductUIMapper,
+                                                    @UI private val scheduler: Scheduler)
     : BasePresenter<CategoryProductsContract.View>(), CategoryProductsContract.Presenter {
 
-    override fun start(categoryName: String?) {
-        categoryName?.let {
-            disposable.add(
-                    getCategoryByNameUseCase
-                            .execute(it)
-                            .doOnSubscribe { getView()?.showLoading(true) }
-                            .observeOn(scheduler)
-                            .subscribe({ category ->
-                                downloadProducts(category)
-                            }, {
-                                getView()?.showLoading(false)
-                                if (it is CategoryNotFoundError) {
-                                    getView()?.showErrorNoCategoryFound()
-                                } else {
-                                    getView()?.showErrorNoConnection()
-                                }
-                            })
-            )
-        }
+    override fun start(categoryId: Int?) {
+        categoryId?.let {
+            downloadProducts(it)
+        } ?: getView()?.showErrorNoCategoryFound()
     }
 
-    private fun downloadProducts(category: Category) {
+    private fun downloadProducts(categoryId: Int) {
         disposable.add(
                 getProductsUseCase
-                        .execute(category)
-                        .subscribeOn(Schedulers.computation())
+                        .execute(categoryId)
+                        .doOnSubscribe { getView()?.showLoading(true) }
                         .observeOn(scheduler)
-                        .doFinally { getView()?.showLoading(false) }
+                        .doOnNext { getView()?.showLoading(false) }
                         .subscribe({ products ->
                             if (products.isNotEmpty()) {
                                 getView()?.populateProducts(mapper.map(products))

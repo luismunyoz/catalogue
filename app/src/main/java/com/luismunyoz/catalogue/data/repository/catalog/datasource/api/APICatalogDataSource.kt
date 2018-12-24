@@ -23,7 +23,7 @@ class APICatalogDataSource(val apiService: ApiService,
                 .flatMap { apiService.getItems(it.data) }
                 .map { mapper.mapProducts(it) }
 
-    override fun saveCategory(category: Category): Completable {
+    override fun saveCategories(categories: List<Category>): Completable {
         throw UnsupportedOperationException("Write operations not allowed")
     }
 

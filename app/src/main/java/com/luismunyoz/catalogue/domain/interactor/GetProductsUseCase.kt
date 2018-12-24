@@ -13,9 +13,9 @@ import javax.inject.Inject
 
 class GetProductsUseCase @Inject constructor(val catalogRepository: CatalogRepository,
                                              @Network val scheduler: Scheduler)
-    : UseCaseWithParameter<Category, List<Product>> {
+    : UseCaseWithParameter<Int, List<Product>> {
 
-    override fun execute(parameter: Category): Flowable<List<Product>> {
+    override fun execute(parameter: Int): Flowable<List<Product>> {
         return catalogRepository.getProducts(parameter)
                 .subscribeOn(scheduler)
     }

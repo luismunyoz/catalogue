@@ -14,7 +14,7 @@ class CategoriesPagerAdapter(val fragmentManager: FragmentManager,
 
     override fun getItem(position: Int): Fragment {
         if(fragments[position] == null){
-            fragments[position] = CategoryProductsFragment.newInstance(categories[position].name)
+            fragments[position] = CategoryProductsFragment.newInstance(categories[position].id)
         }
         return fragments[position]!!
     }
