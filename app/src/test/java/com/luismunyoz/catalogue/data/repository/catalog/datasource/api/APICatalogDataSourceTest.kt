@@ -8,10 +8,7 @@ import com.luismunyoz.catalogue.domain.entity.Product
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Flowable
 import io.reactivex.Single
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 
 class APICatalogDataSourceTest {
 
@@ -71,14 +68,16 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
+            val categories = listOf(APICategory(1, "2", "data"))
             val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
             val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
                     .withServiceProductsResponse(products)
                     .withMapperProductsResponse(mapped)
 
-            val observer = datasource.requestProductsForCategory(0).test()
+            val observer = datasource.requestProductsForCategory(1).test()
 
             with(observer) {
                 assertNoErrors()
@@ -88,13 +87,34 @@ class APICatalogDataSourceTest {
         }
 
         @Test
+        fun `should emit error if category not found`() {
+            val categories = listOf(APICategory(1, "2", "data"))
+            val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
+            val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+
+            ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
+                    .withServiceProductsResponse(products)
+                    .withMapperProductsResponse(mapped)
+
+            val observer = datasource.requestProductsForCategory(0).test()
+
+            with(observer) {
+                assertError(NoSuchElementException::class.java)
+                assertNoValues()
+            }
+        }
+
+        @Test
         fun `should emit network error`() {
+            val categories = listOf(APICategory(1, "2", "data"))
             val error = Throwable()
 
             ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
                     .withServiceProductsResponse(error)
 
-            val observer = datasource.requestProductsForCategory(0).test()
+            val observer = datasource.requestProductsForCategory(1).test()
 
             with(observer) {
                 assertError(error)
@@ -104,7 +124,7 @@ class APICatalogDataSourceTest {
     }
 
     @Nested
-    @DisplayName("With categories save requeested")
+    @DisplayName("With categories save requested")
     inner class CategoriesSaveRequested {
 
         @Test
@@ -121,7 +141,7 @@ class APICatalogDataSourceTest {
     }
 
     @Nested
-    @DisplayName("With products save requeested")
+    @DisplayName("With products save requested")
     inner class ProductsSaveRequested {
 
         @Test
@@ -131,7 +151,7 @@ class APICatalogDataSourceTest {
             val observer = datasource.saveCategoryProducts(0, products).test()
 
             with(observer) {
-                assertError(UnsupportedOperationException::class.java)
+                //assertThrows(UnsupportedOperationException(), {})
                 assertNoValues()
             }
         }

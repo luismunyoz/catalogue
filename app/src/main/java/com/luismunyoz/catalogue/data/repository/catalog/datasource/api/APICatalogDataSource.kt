@@ -17,7 +17,8 @@ class APICatalogDataSource(val apiService: ApiService,
     override fun requestProductsForCategory(categoryId: Int): Single<List<Product>> =
         apiService
                 .getCategories()
-                .flattenAsFlowable { it }
+                .toFlowable()
+                .flatMapIterable { it }
                 .filter { it.id == categoryId }
                 .firstOrError()
                 .flatMap { apiService.getItems(it.data) }
