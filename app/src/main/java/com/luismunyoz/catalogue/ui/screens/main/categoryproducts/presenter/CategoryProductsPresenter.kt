@@ -25,7 +25,7 @@ class CategoryProductsPresenter @Inject constructor(private val getProductsUseCa
                         .execute(categoryId)
                         .doOnSubscribe { getView()?.showLoading(true) }
                         .observeOn(scheduler)
-                        .doOnNext { getView()?.showLoading(false) }
+                        .doFinally { getView()?.showLoading(false) }
                         .subscribe({ products ->
                             if (products.isNotEmpty()) {
                                 getView()?.populateProducts(mapper.map(products))

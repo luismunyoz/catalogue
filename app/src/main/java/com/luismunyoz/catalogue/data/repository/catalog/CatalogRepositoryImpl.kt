@@ -7,7 +7,6 @@ import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.luismunyoz.catalogue.domain.repository.CatalogRepository
 import io.reactivex.Flowable
-import io.reactivex.Single
 import javax.inject.Inject
 
 class CatalogRepositoryImpl @Inject constructor(@Remote val remoteDatasource: CatalogDataSource,

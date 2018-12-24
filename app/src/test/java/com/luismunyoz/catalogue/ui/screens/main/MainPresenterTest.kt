@@ -42,7 +42,7 @@ class MainPresenterTest {
     @Test
     fun `should populate categories when downloaded`(){
         val categories = buildCategories()
-        val mapped = listOf(UICategory("1"), UICategory("2"))
+        val mapped = listOf(UICategory(1, "1"), UICategory(2, "2"))
 
         ArrangeBuilder()
                 .withGetCategoriesResponse(categories)
@@ -72,8 +72,8 @@ class MainPresenterTest {
     }
 
     private fun buildCategories(): List<Category> {
-        return listOf(Category("1", "http://www.first.com"),
-                Category("2", "http://www.second.com"))
+        return listOf(Category(1, "http://www.first.com"),
+                Category(2, "http://www.second.com"))
     }
 
     inner class ArrangeBuilder {

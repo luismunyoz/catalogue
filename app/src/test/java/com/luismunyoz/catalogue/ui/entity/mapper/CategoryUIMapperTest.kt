@@ -17,7 +17,7 @@ class CategoryUIMapperTest {
 
     @Test
     fun `should map a category`(){
-        val category = Category("name", "data")
+        val category = Category(1, "data")
 
         val mapped = mapper.map(category)
 
@@ -28,8 +28,8 @@ class CategoryUIMapperTest {
 
     @Test
     fun `should map a list of categories`(){
-        val categories = listOf(Category("name1", "data1"),
-                Category("name2", "data2"))
+        val categories = listOf(Category(1, "name1"),
+                Category(2, "name2"))
 
         val mapped = mapper.map(categories)
 

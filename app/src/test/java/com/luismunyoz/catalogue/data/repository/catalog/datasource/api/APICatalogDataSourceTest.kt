@@ -1,12 +1,13 @@
 package com.luismunyoz.catalogue.data.repository.catalog.datasource.api
 
-import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.CacheCategory
-import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.CacheProduct
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.APICategory
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.APIProduct
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.mapper.APIMapper
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Flowable
+import io.reactivex.Single
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,8 +33,8 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
-            val categories = listOf(CacheCategory("1", "1"))
-            val mapped = listOf(Category("1", "1"))
+            val categories = listOf(APICategory(1, "1", "data"))
+            val mapped = listOf(Category(1, "2"))
 
             ArrangeBuilder()
                     .withServiceCategoriesResponse(categories)
@@ -70,14 +71,14 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
-            val products = listOf(CacheProduct("0", "sample", "sold_out", 0, 0, 0, ""))
+            val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
             val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
                     .withServiceProductsResponse(products)
                     .withMapperProductsResponse(mapped)
 
-            val observer = datasource.requestProductsForCategory(Category("0", "0")).test()
+            val observer = datasource.requestProductsForCategory(0).test()
 
             with(observer) {
                 assertNoErrors()
@@ -93,7 +94,7 @@ class APICatalogDataSourceTest {
             ArrangeBuilder()
                     .withServiceProductsResponse(error)
 
-            val observer = datasource.requestProductsForCategory(Category("0", "0")).test()
+            val observer = datasource.requestProductsForCategory(0).test()
 
             with(observer) {
                 assertError(error)
@@ -102,25 +103,60 @@ class APICatalogDataSourceTest {
         }
     }
 
+    @Nested
+    @DisplayName("With categories save requeested")
+    inner class CategoriesSaveRequested {
+
+        @Test
+        fun `should emit error`() {
+            val categories = listOf(Category(1, "2"))
+
+            val observer = datasource.saveCategories(categories).test()
+
+            with(observer) {
+                assertError(UnsupportedOperationException::class.java)
+                assertNoValues()
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("With products save requeested")
+    inner class ProductsSaveRequested {
+
+        @Test
+        fun `should emit error`() {
+            val products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+
+            val observer = datasource.saveCategoryProducts(0, products).test()
+
+            with(observer) {
+                assertError(UnsupportedOperationException::class.java)
+                assertNoValues()
+            }
+        }
+    }
+
+
     inner class ArrangeBuilder {
 
-        fun withServiceCategoriesResponse(response: List<CacheCategory>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(apiService).getCategories()
+        fun withServiceCategoriesResponse(response: List<APICategory>): ArrangeBuilder {
+            doAnswer { Single.just(response) }.whenever(apiService).getCategories()
             return this
         }
 
         fun withServiceCategoriesResponse(response: Throwable): ArrangeBuilder {
-            whenever(apiService.getCategories()).thenReturn(Flowable.error(response))
+            whenever(apiService.getCategories()).thenReturn(Single.error(response))
             return this
         }
 
-        fun withServiceProductsResponse(response: List<CacheProduct>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(apiService).getItems(any())
+        fun withServiceProductsResponse(response: List<APIProduct>): ArrangeBuilder {
+            doAnswer { Single.just(response) }.whenever(apiService).getItems(any())
             return this
         }
 
         fun withServiceProductsResponse(response: Throwable): ArrangeBuilder {
-            whenever(apiService.getItems(any())).thenReturn(Flowable.error(response))
+            whenever(apiService.getItems(any())).thenReturn(Single.error(response))
             return this
         }
 
