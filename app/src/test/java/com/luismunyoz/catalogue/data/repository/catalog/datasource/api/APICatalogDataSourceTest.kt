@@ -131,11 +131,8 @@ class APICatalogDataSourceTest {
         fun `should emit error`() {
             val categories = listOf(Category(1, "2"))
 
-            val observer = datasource.saveCategories(categories).test()
-
-            with(observer) {
-                assertError(UnsupportedOperationException::class.java)
-                assertNoValues()
+            Assertions.assertThrows(UnsupportedOperationException::class.java) {
+                datasource.saveCategories(categories).test()
             }
         }
     }
@@ -148,11 +145,8 @@ class APICatalogDataSourceTest {
         fun `should emit error`() {
             val products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
-            val observer = datasource.saveCategoryProducts(0, products).test()
-
-            with(observer) {
-                //assertThrows(UnsupportedOperationException(), {})
-                assertNoValues()
+            Assertions.assertThrows(UnsupportedOperationException::class.java) {
+                datasource.saveCategoryProducts(0, products).test()
             }
         }
     }
