@@ -2,11 +2,16 @@ package com.luismunyoz.catalogue.data.repository.catalog.datasource
 
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
-import io.reactivex.Flowable
+import io.reactivex.Completable
+import io.reactivex.Single
 
 interface CatalogDataSource {
 
-    fun requestCategories(): Flowable<List<Category>>
+    fun requestCategories(): Single<List<Category>>
 
-    fun requestProductsForCategory(category: Category): Flowable<List<Product>>
+    fun requestProductsForCategory(categoryId: Int): Single<List<Product>>
+
+    fun saveCategories(categories: List<Category>): Completable
+
+    fun saveCategoryProducts(categoryId: Int, products: List<Product>): Completable
 }

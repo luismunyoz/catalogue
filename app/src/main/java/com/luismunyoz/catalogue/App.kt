@@ -3,6 +3,7 @@ package com.luismunyoz.catalogue
 import android.app.Activity
 import android.app.Application
 import com.luismunyoz.catalogue.di.DaggerApplicationComponent
+import com.pacoworks.rxpaper2.RxPaperBook
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -21,6 +22,8 @@ class App : Application(), HasActivityInjector {
                 .application(this)
                 .build()
                 .inject(this)
+
+        RxPaperBook.init(this)
     }
 
 }

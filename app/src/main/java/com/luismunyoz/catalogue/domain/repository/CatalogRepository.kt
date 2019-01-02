@@ -8,7 +8,5 @@ interface CatalogRepository {
 
     fun getCategories(): Flowable<List<Category>>
 
-    fun getCategoryByName(name: String) : Flowable<Category>
-
-    fun getProducts(category: Category): Flowable<List<Product>>
+    fun getProducts(categoryId: Int): Flowable<List<Product>>
 }

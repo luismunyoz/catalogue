@@ -1,18 +1,34 @@
 package com.luismunyoz.catalogue.data.repository.catalog.datasource.api
 
-import com.luismunyoz.catalogue.data.entities.catalog.mapper.APIMapper
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.mapper.APIMapper
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 class APICatalogDataSource(val apiService: ApiService,
                            val mapper: APIMapper) : CatalogDataSource {
 
-    override fun requestCategories(): Flowable<List<Category>> =
+    override fun requestCategories(): Single<List<Category>> =
         apiService.getCategories().map { mapper.mapCategories(it) }
 
-    override fun requestProductsForCategory(category: Category): Flowable<List<Product>> =
-        apiService.getItems(category.data).map { mapper.mapProducts(it) }
+    override fun requestProductsForCategory(categoryId: Int): Single<List<Product>> =
+        apiService
+                .getCategories()
+                .toFlowable()
+                .flatMapIterable { it }
+                .filter { it.id == categoryId }
+                .firstOrError()
+                .flatMap { apiService.getItems(it.data) }
+                .map { mapper.mapProducts(it) }
 
+    override fun saveCategories(categories: List<Category>): Completable {
+        throw UnsupportedOperationException("Write operations not allowed")
+    }
+
+    override fun saveCategoryProducts(categoryId: Int, products: List<Product>): Completable {
+        throw UnsupportedOperationException("Write operations not allowed")
+    }
 }

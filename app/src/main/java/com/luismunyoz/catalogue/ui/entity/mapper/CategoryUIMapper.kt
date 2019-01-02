@@ -10,6 +10,6 @@ class CategoryUIMapper @Inject constructor() {
 
     fun map(categories: List<Category>) : List<UICategory> = categories.map { map(it) }
 
-    fun map(category: Category) : UICategory = UICategory(category.name)
+    fun map(category: Category) : UICategory = UICategory(category.id, category.name)
 
 }

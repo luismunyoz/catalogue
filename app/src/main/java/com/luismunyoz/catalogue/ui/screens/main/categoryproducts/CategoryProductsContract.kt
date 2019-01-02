@@ -21,6 +21,6 @@ interface CategoryProductsContract {
 
     interface Presenter : BaseContract.Presenter<View> {
 
-        fun start(categoryName: String?)
+        fun start(categoryId: Int?)
     }
 }

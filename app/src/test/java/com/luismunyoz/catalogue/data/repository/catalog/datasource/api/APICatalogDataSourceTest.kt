@@ -1,19 +1,14 @@
 package com.luismunyoz.catalogue.data.repository.catalog.datasource.api
 
-import com.luismunyoz.catalogue.data.entities.catalog.APICategory
-import com.luismunyoz.catalogue.data.entities.catalog.APIProduct
-import com.luismunyoz.catalogue.data.entities.catalog.mapper.APIMapper
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.APICategory
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.APIProduct
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.mapper.APIMapper
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
-import com.luismunyoz.catalogue.ui.entity.UIProduct
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Flowable
-import org.junit.Assert.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito
+import io.reactivex.Single
+import org.junit.jupiter.api.*
 
 class APICatalogDataSourceTest {
 
@@ -35,8 +30,8 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
-            val categories = listOf(APICategory("1", "1"))
-            val mapped = listOf(Category("1", "1"))
+            val categories = listOf(APICategory(1, "1", "data"))
+            val mapped = listOf(Category(1, "2"))
 
             ArrangeBuilder()
                     .withServiceCategoriesResponse(categories)
@@ -73,14 +68,16 @@ class APICatalogDataSourceTest {
 
         @Test
         fun `should emit network result`() {
+            val categories = listOf(APICategory(1, "2", "data"))
             val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
             val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
                     .withServiceProductsResponse(products)
                     .withMapperProductsResponse(mapped)
 
-            val observer = datasource.requestProductsForCategory(Category("0", "0")).test()
+            val observer = datasource.requestProductsForCategory(1).test()
 
             with(observer) {
                 assertNoErrors()
@@ -90,13 +87,34 @@ class APICatalogDataSourceTest {
         }
 
         @Test
+        fun `should emit error if category not found`() {
+            val categories = listOf(APICategory(1, "2", "data"))
+            val products = listOf(APIProduct("0", "sample", "sold_out", 0, 0, 0, ""))
+            val mapped = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+
+            ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
+                    .withServiceProductsResponse(products)
+                    .withMapperProductsResponse(mapped)
+
+            val observer = datasource.requestProductsForCategory(0).test()
+
+            with(observer) {
+                assertError(NoSuchElementException::class.java)
+                assertNoValues()
+            }
+        }
+
+        @Test
         fun `should emit network error`() {
+            val categories = listOf(APICategory(1, "2", "data"))
             val error = Throwable()
 
             ArrangeBuilder()
+                    .withServiceCategoriesResponse(categories)
                     .withServiceProductsResponse(error)
 
-            val observer = datasource.requestProductsForCategory(Category("0", "0")).test()
+            val observer = datasource.requestProductsForCategory(1).test()
 
             with(observer) {
                 assertError(error)
@@ -105,25 +123,54 @@ class APICatalogDataSourceTest {
         }
     }
 
+    @Nested
+    @DisplayName("With categories save requested")
+    inner class CategoriesSaveRequested {
+
+        @Test
+        fun `should emit error`() {
+            val categories = listOf(Category(1, "2"))
+
+            Assertions.assertThrows(UnsupportedOperationException::class.java) {
+                datasource.saveCategories(categories).test()
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("With products save requested")
+    inner class ProductsSaveRequested {
+
+        @Test
+        fun `should emit error`() {
+            val products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+
+            Assertions.assertThrows(UnsupportedOperationException::class.java) {
+                datasource.saveCategoryProducts(0, products).test()
+            }
+        }
+    }
+
+
     inner class ArrangeBuilder {
 
         fun withServiceCategoriesResponse(response: List<APICategory>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(apiService).getCategories()
+            doAnswer { Single.just(response) }.whenever(apiService).getCategories()
             return this
         }
 
         fun withServiceCategoriesResponse(response: Throwable): ArrangeBuilder {
-            whenever(apiService.getCategories()).thenReturn(Flowable.error(response))
+            whenever(apiService.getCategories()).thenReturn(Single.error(response))
             return this
         }
 
         fun withServiceProductsResponse(response: List<APIProduct>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(apiService).getItems(any())
+            doAnswer { Single.just(response) }.whenever(apiService).getItems(any())
             return this
         }
 
         fun withServiceProductsResponse(response: Throwable): ArrangeBuilder {
-            whenever(apiService.getItems(any())).thenReturn(Flowable.error(response))
+            whenever(apiService.getItems(any())).thenReturn(Single.error(response))
             return this
         }
 

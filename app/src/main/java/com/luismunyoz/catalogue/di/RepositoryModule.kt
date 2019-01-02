@@ -4,6 +4,7 @@ import com.luismunyoz.catalogue.di.qualifier.Remote
 import com.luismunyoz.catalogue.domain.repository.CatalogRepository
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSource
 import com.luismunyoz.catalogue.data.repository.catalog.CatalogRepositoryImpl
+import com.luismunyoz.catalogue.di.qualifier.Cached
 import com.luismunyoz.catalogue.di.qualifier.Network
 import dagger.Module
 import dagger.Provides
@@ -20,6 +21,7 @@ class RepositoryModule {
     fun provideNetworkScheduler(): Scheduler = Schedulers.io()
 
     @Provides @Singleton
-    fun provideCatalogRepository(@Remote apiCatalogDataSource: CatalogDataSource): CatalogRepository
-            = CatalogRepositoryImpl(apiCatalogDataSource)
+    fun provideCatalogRepository(@Remote apiCatalogDataSource: CatalogDataSource,
+                                 @Cached cacheCatalogDataSource: CatalogDataSource): CatalogRepository
+            = CatalogRepositoryImpl(apiCatalogDataSource, cacheCatalogDataSource)
 }

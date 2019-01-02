@@ -7,7 +7,7 @@ import com.luismunyoz.catalogue.ui.entity.mapper.CategoryUIMapper
 import io.reactivex.Scheduler
 import javax.inject.Inject
 
-class MainPresenter @Inject constructor(val getCategoriesInteractor: GetCategoriesUseCase,
+class MainPresenter @Inject constructor(private val getCategoriesInteractor: GetCategoriesUseCase,
                                         val mapper: CategoryUIMapper,
                                         @UI val scheduler: Scheduler) : BasePresenter<MainContract.View>(),
         MainContract.Presenter {

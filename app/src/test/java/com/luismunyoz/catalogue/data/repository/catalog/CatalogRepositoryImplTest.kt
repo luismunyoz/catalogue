@@ -4,7 +4,9 @@ import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSo
 import com.luismunyoz.catalogue.domain.entity.Category
 import com.luismunyoz.catalogue.domain.entity.Product
 import com.nhaarman.mockito_kotlin.*
+import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -14,11 +16,12 @@ class CatalogRepositoryImplTest {
 
     private lateinit var repository: CatalogRepositoryImpl
     private val remote: CatalogDataSource = mock()
+    private val cache: CatalogDataSource = mock()
 
     @BeforeEach
     internal fun setUp() {
-        reset(remote)
-        repository = CatalogRepositoryImpl(remote)
+        reset(remote, cache)
+        repository = CatalogRepositoryImpl(remote, cache)
     }
 
     @Nested
@@ -26,86 +29,43 @@ class CatalogRepositoryImplTest {
     inner class CategoriesRequested {
 
         @Test
-        fun `should emit network result`() {
-            val categories = listOf(Category("1","1"))
+        fun `should emit cache and network results`() {
+            val categoriesCache = listOf(Category(2, "name"))
+            val categoriesRemote = listOf(Category(1, "name"))
 
             ArrangeBuilder()
-                    .withRemoteCategoriesResponse(categories)
+                    .withCacheSaveCategorySuccess()
+                    .withCacheCategoriesResponse(categoriesCache)
+                    .withRemoteCategoriesResponse(categoriesRemote)
 
             val observer = repository.getCategories().test()
 
             with(observer){
                 assertNoErrors()
-                assertValueCount(1)
-                assertValueAt(0, categories)
+                assertValueCount(2)
+                assertValues(categoriesCache, categoriesRemote)
             }
+
+            verify(cache).saveCategories(categoriesRemote)
         }
 
         @Test
-        fun `should emit network error`(){
+        fun `should emit cache result and network error`(){
             val error = Throwable()
+            val categoriesCache = listOf(Category(2, "name"))
 
             ArrangeBuilder()
+                    .withCacheCategoriesResponse(categoriesCache)
                     .withRemoteCategoriesResponse(error)
 
             val observer = repository.getCategories().test()
 
             with(observer){
                 assertError(error)
-                assertNoValues()
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("With category by name requested")
-    inner class CategoryByNameRequested {
-
-        @Test
-        fun `should emit network result if category found`() {
-            val categories = listOf(Category("1","1"))
-
-            ArrangeBuilder()
-                    .withRemoteCategoriesResponse(categories)
-
-            val observer = repository.getCategoryByName(categories[0].name).test()
-
-            with(observer){
-                assertNoErrors()
                 assertValueCount(1)
-                assertValueAt(0, categories[0])
             }
-        }
 
-        @Test
-        fun `should not emit if category not found`() {
-            val categories = listOf(Category("1","1"))
-
-            ArrangeBuilder()
-                    .withRemoteCategoriesResponse(categories)
-
-            val observer = repository.getCategoryByName("notFound").test()
-
-            with(observer){
-                assertNoErrors()
-                assertValueCount(0)
-                assertComplete()
-            }
-        }
-
-        @Test
-        fun `should emit network error`(){
-            val error = Throwable()
-
-            ArrangeBuilder()
-                    .withRemoteCategoriesResponse(error)
-
-            val observer = repository.getCategoryByName("1").test()
-
-            with(observer){
-                assertError(error)
-                assertNoValues()
-            }
+            verify(cache, never()).saveCategories(any())
         }
     }
 
@@ -114,59 +74,85 @@ class CatalogRepositoryImplTest {
     inner class ProductsRequested {
 
         @Test
-        fun `should emit network result`() {
-            val category = Category("1", "1")
-            val products = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+        fun `should emit network and cache result`() {
+            val remoteProducts = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
+            val cacheProducts = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
-                    .withRemoteProductsResponse(products)
+                    .withCacheSaveProductsSuccess()
+                    .withCacheProductsResponse(cacheProducts)
+                    .withRemoteProductsResponse(remoteProducts)
 
-            val observer = repository.getProducts(category).test()
+            val observer = repository.getProducts(1).test()
 
             with(observer){
                 assertNoErrors()
-                assertValueCount(1)
-                assertValueAt(0, products)
+                assertValueCount(2)
+                assertValues(cacheProducts, remoteProducts)
             }
+
+            verify(cache).saveCategoryProducts(1, remoteProducts)
         }
 
         @Test
-        fun `should emit empty list on network error`(){
-            val category = Category("1", "1")
+        fun `should emit cache result and network error`(){
             val error = Throwable()
+            val cacheProducts = listOf(Product("0", "sample", "sold_out", 0, 0, 0, ""))
 
             ArrangeBuilder()
                     .withRemoteProductsResponse(error)
+                    .withCacheProductsResponse(cacheProducts)
 
-            val observer = repository.getProducts(category).test()
+            val observer = repository.getProducts(1).test()
 
             with(observer){
-                assertNoErrors()
+                assertError(error)
                 assertValueCount(1)
-                assertValue { it.isEmpty() }
             }
+
+            verify(cache, never()).saveCategoryProducts(any(), any())
         }
     }
 
     inner class ArrangeBuilder {
 
         fun withRemoteCategoriesResponse(response: List<Category>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(remote).requestCategories()
+            doAnswer { Single.just(response) }.whenever(remote).requestCategories()
             return this
         }
 
         fun withRemoteCategoriesResponse(response: Throwable): ArrangeBuilder {
-            whenever(remote.requestCategories()).thenReturn(Flowable.error(response))
+            whenever(remote.requestCategories()).thenReturn(Single.error(response))
+            return this
+        }
+
+        fun withCacheCategoriesResponse(response: List<Category>): ArrangeBuilder {
+            doAnswer { Single.just(response) }.whenever(cache).requestCategories()
             return this
         }
 
         fun withRemoteProductsResponse(response: List<Product>): ArrangeBuilder {
-            doAnswer { Flowable.just(response) }.whenever(remote).requestProductsForCategory(any())
+            doAnswer { Single.just(response) }.whenever(remote).requestProductsForCategory(any())
             return this
         }
 
         fun withRemoteProductsResponse(response: Throwable): ArrangeBuilder {
-            whenever(remote.requestProductsForCategory(any())).thenReturn(Flowable.error(response))
+            whenever(remote.requestProductsForCategory(any())).thenReturn(Single.error(response))
+            return this
+        }
+
+        fun withCacheProductsResponse(response: List<Product>): ArrangeBuilder {
+            doAnswer { Single.just(response) }.whenever(cache).requestProductsForCategory(any())
+            return this
+        }
+
+        fun withCacheSaveCategorySuccess(): ArrangeBuilder {
+            doAnswer { Completable.complete() }.whenever(cache).saveCategories(any())
+            return this
+        }
+
+        fun withCacheSaveProductsSuccess(): ArrangeBuilder {
+            doAnswer { Completable.complete() }.whenever(cache).saveCategoryProducts(any(), any())
             return this
         }
     }

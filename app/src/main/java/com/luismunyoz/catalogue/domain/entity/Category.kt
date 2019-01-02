@@ -1,6 +1,6 @@
 package com.luismunyoz.catalogue.domain.entity
 
-class Category (
-    val name: String,
-    val data: String
+class Category(
+        val id: Int,
+        val name: String
 )

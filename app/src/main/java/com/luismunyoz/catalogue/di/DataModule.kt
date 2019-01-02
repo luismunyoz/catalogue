@@ -2,12 +2,16 @@ package com.luismunyoz.catalogue.di
 
 import android.content.Context
 import com.luismunyoz.catalogue.BuildConfig
-import com.luismunyoz.catalogue.data.entities.catalog.mapper.APIMapper
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.model.mapper.APIMapper
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.APICatalogDataSource
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.api.ApiService
 import com.luismunyoz.catalogue.di.qualifier.Remote
 import com.luismunyoz.catalogue.di.qualifier.ApplicationQualifier
 import com.luismunyoz.catalogue.data.repository.catalog.datasource.CatalogDataSource
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.cache.model.CacheCatalogDataSource
+import com.luismunyoz.catalogue.data.repository.catalog.datasource.cache.model.mapper.CacheMapper
+import com.luismunyoz.catalogue.di.qualifier.Cached
+import com.pacoworks.rxpaper2.RxPaperBook
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -50,6 +54,13 @@ class DataModule {
     @Provides @Singleton @Remote
     fun providesApiDataSource(apiService: ApiService, mapper: APIMapper): CatalogDataSource =
             APICatalogDataSource(apiService, mapper)
+
+    @Provides @Singleton
+    fun provideCategoriesCache() : RxPaperBook = RxPaperBook.with("categories")
+
+    @Provides @Singleton @Cached
+    fun providesCacheDataSource(paperBook: RxPaperBook, mapper: CacheMapper): CatalogDataSource =
+            CacheCatalogDataSource(paperBook, mapper)
 
     companion object {
         const val CACHE_SIZE = 10 * 1024 * 1024L

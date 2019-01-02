@@ -21,17 +21,17 @@ class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View,
 
     override fun getLayoutId(): Int = R.layout.fragment_categoryproducts
 
-    var name: String? = null
+    var id: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        name = arguments?.getString(ARG_NAME)
+        id = arguments?.getInt(ARG_ID)
         AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.start(name)
+        presenter.start(id)
     }
 
     override fun showErrorNoConnection() {
@@ -62,11 +62,11 @@ class CategoryProductsFragment: BaseFragment<CategoryProductsContract.View,
     }
 
     companion object {
-        private const val ARG_NAME = "NAME"
+        private const val ARG_ID = "ID"
 
-        fun newInstance(categoryName : String) : CategoryProductsFragment {
-            val args: Bundle = Bundle()
-            args.putString(ARG_NAME, categoryName)
+        fun newInstance(categoryID : Int) : CategoryProductsFragment {
+            val args = Bundle()
+            args.putInt(ARG_ID, categoryID)
             val fragment = CategoryProductsFragment()
             fragment.arguments = args
             return fragment
